@@ -1,0 +1,17 @@
+MenuButton
+{
+    background-color: yellow;
+    border-width: 5px;
+    border-color: black;
+    border-radius: 25px;
+    border-style:inset;
+    font-size: 30px;
+}
+MenuButton:hover
+{
+    background-color: green;
+}
+MenuButton:pressed
+{
+    background-color: red;
+}
