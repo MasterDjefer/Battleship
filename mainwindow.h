@@ -4,12 +4,15 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QGroupBox>
 #include <QStackedLayout>
+#include <QPropertyAnimation>
+#include <QPalette>
+#include <QRgb>
 
 #include <QState>
 #include <QStateMachine>
 
+#include "fieldwidget.h"
 #include "menubutton.h"
 
 class MainWindow : public QWidget
@@ -23,7 +26,8 @@ class MainWindow : public QWidget
         About,
         Exit,
         CreateGame,
-        ConnectToGame
+        ConnectToGame,
+        Back
     };
 
 public:
@@ -33,6 +37,7 @@ public:
 private:
     void initMainMenu();
     void initGameModeMenu();
+    void initFieldWidget();
     void initStates();
 
 private:
@@ -40,9 +45,13 @@ private:
 
     QVBoxLayout* mMainMenu;
     MenuButton* mButtonNewGame;
+    MenuButton* mButtonExit;
 
     QVBoxLayout* mGameModeMenu;
-    QVBoxLayout* mSettingsMenu;
+    MenuButton* mButtonCreateGame;
+    MenuButton* mButtonBack1;
+
+    FieldWidget* mFieldWidget;
 
     QStateMachine* mStateMachine;
 

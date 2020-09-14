@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>styles/CustomButton.qss</file>
+        <file>images/back.png</file>
     </qresource>
 </RCC>

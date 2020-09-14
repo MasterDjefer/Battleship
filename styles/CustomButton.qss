@@ -15,3 +15,17 @@ MenuButton:pressed
 {
     background-color: red;
 }
+
+QPushButton#BackImageButton
+{
+    border-image: url(:/images/back.png);
+    border-radius: 10px;
+}
+QPushButton#BackImageButton:hover
+{
+    background-color: white;
+}
+QPushButton#BackImageButton:pressed
+{
+    background-color: black;
+}
