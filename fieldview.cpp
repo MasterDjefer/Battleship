@@ -2,7 +2,9 @@
 
 FieldView::FieldView()
 {
-    QGraphicsScene* mScene = new QGraphicsScene;
+    mFieldModel = new FieldModel;
+
+    mScene = new QGraphicsScene;
     mScene->setSceneRect(0, 0, 500, 500);
 
     this->setScene(mScene);
@@ -14,11 +16,14 @@ FieldView::FieldView()
     {
         for (int j = 0; j < FIELD_SIZE; ++j)
         {
-            QGraphicsRectItem *temp = new QGraphicsRectItem;
-            temp->setRect(i*50,j*50,50,50);
+            QGraphicsPixmapItem *temp = new QGraphicsPixmapItem;
+            QPixmap pixmap(":/images/primary.png");
+            pixmap = pixmap.scaled(50,50);
+            temp->setPixmap(pixmap);
 //            temp->setBrush(Qt::red);
+            temp->setPos(50 * i, 50 * j);
             mScene->addItem(temp);
-
+            mCells[i][j] = temp;
 
 
 //            QPushButton* cell = new QPushButton;
@@ -52,7 +57,25 @@ FieldView::FieldView()
 
 void FieldView::mousePressEvent(QMouseEvent *event)
 {
-    int i = event->pos().x() / 50;
-    int j = event->pos().y() / 50;
-    qDebug() << i << j;
+    if (event->buttons() & Qt::LeftButton)
+    {
+        int i = event->pos().x() / 50;
+        int j = event->pos().y() / 50;
+        QPixmap pixmap;
+
+        switch (mFieldModel->getCellValue(i, j))
+        {
+        case FieldModel::Empty:
+            pixmap = QPixmap(":/images/empty.png");
+            break;
+        case FieldModel::Ship:
+            pixmap = QPixmap(":/images/hurted.png");
+            break;
+        default:
+            break;
+        }
+
+        pixmap = pixmap.scaled(50,50);
+        mCells[i][j]->setPixmap(pixmap);
+    }
 }

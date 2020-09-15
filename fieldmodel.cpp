@@ -3,6 +3,10 @@
 FieldModel::FieldModel()
 {
     initField();
+
+    mField[0][0] = Ship;
+    mField[0][1] = Ship;
+    mField[0][2] = Ship;
 }
 
 FieldModel::CellState FieldModel::getCellValue(int i, int j)

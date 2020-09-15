@@ -2,5 +2,10 @@
     <qresource prefix="/">
         <file>styles/CustomButton.qss</file>
         <file>images/back.png</file>
+        <file>images/ship.png</file>
+        <file>images/killed.png</file>
+        <file>images/hurted.png</file>
+        <file>images/empty.png</file>
+        <file>images/primary.png</file>
     </qresource>
 </RCC>
