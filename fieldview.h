@@ -34,9 +34,14 @@ protected:
 private:
     void initField();
     void initShips();
+    void initRotateButton();
     void setShipDefaultPos(int index);
     static QPoint cellPosition(const QPoint& point);
     static bool isShipsCrossed(QGraphicsRectItem* targetShip, QGraphicsRectItem* ship);
+    bool isRotatePressed(QMouseEvent *event);
+    bool isShipPrimaryPos(QGraphicsRectItem* ship);
+    void rotateShip(QGraphicsRectItem* ship);
+    bool isShipOut(QGraphicsRectItem* ship);
 
 private:
     QGraphicsScene* mScene;
