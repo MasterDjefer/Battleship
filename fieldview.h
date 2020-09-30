@@ -10,6 +10,7 @@
 #include <QMimeData>
 #include <QPushButton>
 #include <QGraphicsProxyWidget>
+#include <QMessageBox>
 
 #include "fieldmodel.h"
 
@@ -34,11 +35,9 @@ protected:
 private:
     void initField();
     void initShips();
-    void initRotateButton();
     void setShipDefaultPos(int index);
     static QPoint cellPosition(const QPoint& point);
     static bool isShipsCrossed(QGraphicsRectItem* targetShip, QGraphicsRectItem* ship);
-    bool isRotatePressed(QMouseEvent *event);
     bool isShipPrimaryPos(QGraphicsRectItem* ship);
     void rotateShip(QGraphicsRectItem* ship);
     bool isShipOut(QGraphicsRectItem* ship);
@@ -52,14 +51,9 @@ private:
     QVector<QGraphicsRectItem*> mShipsPosition;
     QGraphicsRectItem* mCurrentItem;
 
-    QGraphicsRectItem* mButtonRotate;
-    bool mIsRotated;
-
-signals:
-    void buttonRotateClicked();
-
-private slots:
+public slots:
     void onButtonRotateClicked();
+    void onButtonFinishClicked();
 };
 
 #endif // FIELDVIEW_H

@@ -3,20 +3,43 @@
 FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
 {
     mMainLayout = new QVBoxLayout;
-    mMainLayout->setAlignment(Qt::AlignCenter);
-
-    mModel = new FieldModel;
+    mNavigationLayout = new QVBoxLayout;
+    mNavigationLayout->setAlignment(Qt::AlignTop);
+    mFieldLayout = new QHBoxLayout;
 
     initFieldView();
+    initRotateButton();
+    initFinishButton();
+    mFieldLayout->addLayout(mNavigationLayout);
+    mMainLayout->addLayout(mFieldLayout);
     initBackButton();
 
+    mMainLayout->setAlignment(Qt::AlignCenter);
     this->setLayout(mMainLayout);
 }
 
 void FieldWidget::initFieldView()
 {
-    FieldView* view = new FieldView;
-    mMainLayout->addWidget(view);
+    mView = new FieldView;
+    mFieldLayout->addWidget(mView);
+}
+
+void FieldWidget::initRotateButton()
+{
+    mButtonRotate = new QPushButton("Rotate");
+    mButtonRotate->setFixedSize(50,50);
+    QObject::connect(mButtonRotate, &QPushButton::clicked, mView, &FieldView::onButtonRotateClicked);
+
+    mNavigationLayout->addWidget(mButtonRotate);
+}
+
+void FieldWidget::initFinishButton()
+{
+    mButtonFinish = new QPushButton("Finish");
+    mButtonFinish->setFixedSize(50,50);
+    QObject::connect(mButtonFinish, &QPushButton::clicked, mView, &FieldView::onButtonFinishClicked);
+
+    mNavigationLayout->addWidget(mButtonFinish);
 }
 
 void FieldWidget::initBackButton()

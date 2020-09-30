@@ -14,20 +14,12 @@ FieldView::FieldView() : mCurrentItem(nullptr)
 
 
     initField();
-    initShips();
-    initRotateButton();
-}
+    initShips();}
 
 void FieldView::mousePressEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
     {
-        if (isRotatePressed(event))
-        {
-            emit buttonRotateClicked();
-            return;
-        }
-
         QPoint cellPos = cellPosition(event->pos());
         int i = cellPos.x();
         int j = cellPos.y();
@@ -82,9 +74,6 @@ void FieldView::mousePressEvent(QMouseEvent *event)
 
 void FieldView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (isRotatePressed(event))
-        return;
-
     if (mCurrentItem)
     {
         QPoint nPos(event->pos().x() - mCurrentItem->rect().width() / 2, event->pos().y() - mCurrentItem->rect().height() / 2);
@@ -113,9 +102,6 @@ void FieldView::mouseMoveEvent(QMouseEvent *event)
 
 void FieldView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (isRotatePressed(event))
-        return;
-
     QPoint cellPos = cellPosition(event->pos());
 
     if (mCurrentItem)
@@ -237,14 +223,6 @@ void FieldView::initShips()
     }
 }
 
-void FieldView::initRotateButton()
-{
-    mButtonRotate = new QGraphicsRectItem(this->mScene->width() - CELL_SIZE * 2, CELL_SIZE, CELL_SIZE, CELL_SIZE);
-    mButtonRotate->setBrush(Qt::darkBlue);
-    this->mScene->addItem(mButtonRotate);
-    QObject::connect(this, &FieldView::buttonRotateClicked, this, &FieldView::onButtonRotateClicked);
-}
-
 void FieldView::setShipDefaultPos(int index)
 {
     mCurrentItem->setRect(mShipsPosition.at(index)->rect().x(), mShipsPosition.at(index)->rect().y(),
@@ -315,17 +293,6 @@ bool FieldView::isShipsCrossed(QGraphicsRectItem *targetShip, QGraphicsRectItem 
     return false;
 }
 
-bool FieldView::isRotatePressed(QMouseEvent *event)
-{
-    if ((event->x() >= mButtonRotate->rect().x() && event->x() <= (mButtonRotate->rect().x() + mButtonRotate->rect().width())) &&
-        (event->y() >= mButtonRotate->rect().y() && event->y() <= (mButtonRotate->rect().y() + mButtonRotate->rect().height())))
-    {
-        return true;
-    }
-
-    return false;
-}
-
 bool FieldView::isShipPrimaryPos(QGraphicsRectItem *ship)
 {
     if (ship)
@@ -364,14 +331,14 @@ bool FieldView::isShipOut(QGraphicsRectItem *ship)
         }
         else//if horizontal pos
         {
-            for (int i = 0; i < ship->rect().width() / CELL_SIZE; ++i)
+            for (std::vector<QPoint>::size_type i = 0; i < ship->rect().width() / CELL_SIZE; ++i)
             {
                 points.push_back(QPoint(ship->rect().x() + CELL_SIZE * i, ship->rect().y()));
             }
         }
 
 
-        for (int i = 0; i < points.size(); ++i)
+        for (std::vector<QPoint>::size_type i = 0; i < points.size(); ++i)
         {
             if (points.at(i).x() >= FIELD_SIZE * CELL_SIZE || points.at(i).y() >= FIELD_SIZE * CELL_SIZE)
             {
@@ -411,4 +378,23 @@ void FieldView::onButtonRotateClicked()
             }
         }
     }
+}
+
+void FieldView::onButtonFinishClicked()
+{
+    //check if all ships are set
+    for (int i = 0; i < mShips.size(); ++i)
+    {
+        QGraphicsRectItem* ship = mShips.at(i);
+        int width = ship->rect().width() > ship->rect().height() ? ship->rect().width() : ship->rect().height();
+        QGraphicsRectItem* shipPos = mShipsPosition.at(width / CELL_SIZE - 1);
+
+        if (shipPos->rect().x() == ship->rect().x() && shipPos->rect().y() == ship->rect().y())
+        {
+            qDebug() << "not all ships are set";
+            return;
+        }
+    }
+
+    qDebug() << "all ships are set";
 }

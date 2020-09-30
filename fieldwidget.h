@@ -23,16 +23,20 @@ public:
 
 private:
     void initFieldView();
+    void initRotateButton();
+    void initFinishButton();
     void initBackButton();
 
 private:
     QVBoxLayout* mMainLayout;
-    QGridLayout* mFieldLayout;
+    QVBoxLayout* mNavigationLayout;
+    QHBoxLayout* mFieldLayout;
+
+    QPushButton* mButtonRotate;
+    QPushButton* mButtonFinish;
     QPushButton* mButtonBack;
 
-    QGraphicsScene* mScene;
-
-    FieldModel* mModel;
+    FieldView* mView;
 
 private slots:
     void onBackButtonClicked();
