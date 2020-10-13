@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     initMainMenu();
     initGameModeMenu();
     initFieldWidget();
+    initWaitWidget();
     initStates();
 }
 
@@ -44,7 +45,6 @@ void MainWindow::initMainMenu()
     QWidget *w = new QWidget;
     w->setLayout(mMainMenu);
     mStackedLayout->addWidget(w);
-    mStackedLayout->setAlignment(Qt::AlignLeft);
 }
 
 void MainWindow::initGameModeMenu()
@@ -75,6 +75,18 @@ void MainWindow::initFieldWidget()
     mStackedLayout->addWidget(mFieldWidget);
 }
 
+void MainWindow::initWaitWidget()
+{
+    mWaitWidget = new WaitWidget;
+
+    QVBoxLayout* l = new QVBoxLayout;
+    l->setAlignment(Qt::AlignCenter);
+    l->addWidget(mWaitWidget);
+    QWidget* w = new QWidget;
+    w->setLayout(l);
+    mStackedLayout->addWidget(w);
+}
+
 void MainWindow::initStates()
 {
     mStateMachine = new QStateMachine(this);
@@ -82,6 +94,7 @@ void MainWindow::initStates()
     QState *state1 = new QState(mStateMachine);
     QState *state2 = new QState(mStateMachine);
     QState *state3 = new QState(mStateMachine);
+    QState *state4 = new QState(mStateMachine);
 
     state1->assignProperty(mStackedLayout, "currentIndex", 0);
     state1->addTransition(mButtonNewGame, &MenuButton::clicked, state2);
@@ -92,6 +105,10 @@ void MainWindow::initStates()
 
     state3->assignProperty(mStackedLayout, "currentIndex", 2);
     state3->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, state2);
+    state3->addTransition(mFieldWidget, &FieldWidget::buttonFinishClicked, state4);
+
+    state4->assignProperty(mStackedLayout, "currentIndex", 3);
+    state4->addTransition(mWaitWidget, &WaitWidget::buttonBackClicked, state3);
 
     mStateMachine->setInitialState(state1);
     mStateMachine->start();

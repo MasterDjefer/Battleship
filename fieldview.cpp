@@ -16,6 +16,53 @@ FieldView::FieldView() : mCurrentItem(nullptr)
     initField();
     initShips();}
 
+void FieldView::resetShips()
+{
+    mCurrentItem = nullptr;
+
+    for (int i = 0; i < FIELD_SIZE; ++i)
+    {
+        for (int j = 0; j < FIELD_SIZE; ++j)
+        {
+            mScene->removeItem(mCells[i][j]);
+            delete mCells[i][j];
+        }
+    }
+
+    while (mShips.size() > 0)
+    {
+        mScene->removeItem(mShips.back());
+        delete mShips.back();
+        mShips.pop_back();
+    }
+    while (mShipsPosition.size() > 0)
+    {
+        mScene->removeItem(mShipsPosition.back());
+        delete mShipsPosition.back();
+        mShipsPosition.pop_back();
+    }
+
+    initField();
+    initShips();
+}
+
+bool FieldView::isFieldReady()
+{
+    for (int i = 0; i < mShips.size(); ++i)
+    {
+        QGraphicsRectItem* ship = mShips.at(i);
+        int width = ship->rect().width() > ship->rect().height() ? ship->rect().width() : ship->rect().height();
+        QGraphicsRectItem* shipPos = mShipsPosition.at(width / CELL_SIZE - 1);
+
+        if (shipPos->rect().x() == ship->rect().x() && shipPos->rect().y() == ship->rect().y())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void FieldView::mousePressEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
@@ -378,23 +425,4 @@ void FieldView::onButtonRotateClicked()
             }
         }
     }
-}
-
-void FieldView::onButtonFinishClicked()
-{
-    //check if all ships are set
-    for (int i = 0; i < mShips.size(); ++i)
-    {
-        QGraphicsRectItem* ship = mShips.at(i);
-        int width = ship->rect().width() > ship->rect().height() ? ship->rect().width() : ship->rect().height();
-        QGraphicsRectItem* shipPos = mShipsPosition.at(width / CELL_SIZE - 1);
-
-        if (shipPos->rect().x() == ship->rect().x() && shipPos->rect().y() == ship->rect().y())
-        {
-            qDebug() << "not all ships are set";
-            return;
-        }
-    }
-
-    qDebug() << "all ships are set";
 }

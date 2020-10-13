@@ -14,6 +14,7 @@
 
 #include "fieldwidget.h"
 #include "menubutton.h"
+#include "waitwidget.h"
 
 class MainWindow : public QWidget
 {
@@ -38,6 +39,7 @@ private:
     void initMainMenu();
     void initGameModeMenu();
     void initFieldWidget();
+    void initWaitWidget();
     void initStates();
 
 private:
@@ -52,6 +54,7 @@ private:
     MenuButton* mButtonBack1;
 
     FieldWidget* mFieldWidget;
+    WaitWidget* mWaitWidget;
 
     QStateMachine* mStateMachine;
 

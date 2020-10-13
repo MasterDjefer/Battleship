@@ -14,14 +14,16 @@ SOURCES += \
     fieldwidget.cpp \
     main.cpp \
     mainwindow.cpp \
-    menubutton.cpp
+    menubutton.cpp \
+    waitwidget.cpp
 
 HEADERS += \
     fieldmodel.h \
     fieldview.h \
     fieldwidget.h \
     mainwindow.h \
-    menubutton.h
+    menubutton.h \
+    waitwidget.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -40,9 +40,11 @@ private:
 
 private slots:
     void onBackButtonClicked();
+    void onButtonFinishClicked();
 
 signals:
     void buttonBackClicked();
+    void buttonFinishClicked();
 };
 
 #endif // FIELDWIDGET_H

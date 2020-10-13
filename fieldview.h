@@ -26,6 +26,8 @@ typedef std::map<int, int> ShipsInfo;
 
 public:
     FieldView();
+    void resetShips();
+    bool isFieldReady();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -53,7 +55,6 @@ private:
 
 public slots:
     void onButtonRotateClicked();
-    void onButtonFinishClicked();
 };
 
 #endif // FIELDVIEW_H

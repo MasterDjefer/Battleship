@@ -37,7 +37,7 @@ void FieldWidget::initFinishButton()
 {
     mButtonFinish = new QPushButton("Finish");
     mButtonFinish->setFixedSize(50,50);
-    QObject::connect(mButtonFinish, &QPushButton::clicked, mView, &FieldView::onButtonFinishClicked);
+    QObject::connect(mButtonFinish, &QPushButton::clicked, this, &FieldWidget::onButtonFinishClicked);
 
     mNavigationLayout->addWidget(mButtonFinish);
 }
@@ -60,4 +60,11 @@ void FieldWidget::initBackButton()
 void FieldWidget::onBackButtonClicked()
 {
     emit buttonBackClicked();
+    mView->resetShips();
+}
+
+void FieldWidget::onButtonFinishClicked()
+{
+    //if (mView->isFieldReady())
+        emit buttonFinishClicked();
 }
