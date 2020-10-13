@@ -16,6 +16,8 @@
 #include "menubutton.h"
 #include "waitwidget.h"
 
+#include "server.h"
+
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -58,6 +60,12 @@ private:
 
     QStateMachine* mStateMachine;
 
+    Server* mServer;
+
     static const char* mButtonTitles[];
+
+private slots:
+    void onFinishButtonClicked();
+    void onBackToMapButtonClicked();
 };
 #endif // WIDGET_H

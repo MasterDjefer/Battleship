@@ -15,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent)
     initFieldWidget();
     initWaitWidget();
     initStates();
+
+    QObject::connect(mFieldWidget, &FieldWidget::buttonFinishClicked, this, &MainWindow::onFinishButtonClicked);
+    QObject::connect(mWaitWidget, &WaitWidget::buttonBackClicked, this, &MainWindow::onBackToMapButtonClicked);
 }
 
 MainWindow::~MainWindow()
@@ -112,6 +115,17 @@ void MainWindow::initStates()
 
     mStateMachine->setInitialState(state1);
     mStateMachine->start();
+}
+
+void MainWindow::onFinishButtonClicked()
+{
+    mServer = new Server;
+    mServer->startServer();
+}
+
+void MainWindow::onBackToMapButtonClicked()
+{
+    delete mServer;
 }
 
 const char* MainWindow::mButtonTitles[] = {"New game", "Settings", "About", "Exit", "Create game", "Connect to game", "Back"};

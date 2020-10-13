@@ -15,6 +15,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     menubutton.cpp \
+    server.cpp \
     waitwidget.cpp
 
 HEADERS += \
@@ -23,6 +24,7 @@ HEADERS += \
     fieldwidget.h \
     mainwindow.h \
     menubutton.h \
+    server.h \
     waitwidget.h
 
 # Default rules for deployment.
