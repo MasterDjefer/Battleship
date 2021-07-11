@@ -34,13 +34,6 @@ class MainWindow : public QWidget
         Back
     };
 
-    enum ESide
-    {
-        NoSide = 0,
-        ServerSide,
-        ClientSide
-    };
-
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -75,12 +68,11 @@ private:
 
     static const char* mButtonTitles[];
 
-    ESide eSide;
-
 private slots:
     void onCreateServerButtonClicked();
     void onBackToMapButtonClicked();
     void onConnectToServerButtonClicked();
-    void onCoordinatesReceived(const QPoint& coordinates);
+    void onShootServerSend(const QPoint& coordinates);
+    void onShootClientSend(const QPoint& coordinates);
 };
 #endif // WIDGET_H

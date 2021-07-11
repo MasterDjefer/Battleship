@@ -36,6 +36,8 @@ FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
 
     mMainLayout->setAlignment(Qt::AlignCenter);
     this->setLayout(mMainLayout);
+
+    QObject::connect(mView, &FieldView::shoot, this, &FieldWidget::onShootFromSignal);
 }
 
 void FieldWidget::initFieldView()
@@ -96,5 +98,15 @@ void FieldWidget::onButtonCreateServerClicked()
 void FieldWidget::onButtonConnectToServerClicked()
 {
     //if (mView->isFieldReady())
-        emit buttonConnectToServerClicked();
+    emit buttonConnectToServerClicked();
+}
+
+void FieldWidget::onShoot(const QPoint &coordinates)
+{
+    mView->onShoot(coordinates);
+}
+
+void FieldWidget::onShootFromSignal(const QPoint &coordinates)
+{
+    emit shoot(coordinates);
 }

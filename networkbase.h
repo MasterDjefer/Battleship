@@ -32,7 +32,7 @@ protected:
     int mClientSocket;
 public:
     NetworkBase();
-    void sendMsg(char* buffer);
+    void sendMsg(const char* buffer);
 
 protected:
     static void assertError(int value, const char* msg);

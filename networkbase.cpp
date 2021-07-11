@@ -4,7 +4,7 @@ NetworkBase::NetworkBase() : mClientSocket(-1)
 {
 }
 
-void NetworkBase::sendMsg(char* buffer)
+void NetworkBase::sendMsg(const char* buffer)
 {
     if (mClientSocket == -1)
     {

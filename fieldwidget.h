@@ -52,11 +52,16 @@ private slots:
     void onBackButtonClicked();
     void onButtonCreateServerClicked();
     void onButtonConnectToServerClicked();
+    void onShootFromSignal(const QPoint& coordinates);
+
+public slots:
+    void onShoot(const QPoint& coordinates);
 
 signals:
     void buttonBackClicked();
     void buttonCreateServerClicked();
     void buttonConnectToServerClicked();
+    void shoot(const QPoint& coordinates);
 };
 
 #endif // FIELDWIDGET_H

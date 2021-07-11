@@ -138,13 +138,10 @@ void MainWindow::showConnectErrorMsg()
 void MainWindow::onCreateServerButtonClicked()
 {
     mServer = new Server;
-    QObject::connect(mServer, &Server::coordinatesReceived, this, &MainWindow::onCoordinatesReceived);
     mServer->startServer();
 
-    eSide = ServerSide;
-
-    //connect fieldview::shoot to server::sendMsg
-    //connect server::coordinatesReceived to fieldview::onShoot
+    QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootServerSend);
+    QObject::connect(mServer, &Server::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
 }
 
 void MainWindow::onBackToMapButtonClicked()
@@ -153,8 +150,6 @@ void MainWindow::onBackToMapButtonClicked()
     {
         delete mServer;
         mServer = nullptr;
-
-        eSide = NoSide;
     }
 }
 
@@ -167,15 +162,21 @@ void MainWindow::onConnectToServerButtonClicked()
         delete mClient;
     }else
     {
-        //connect fieldview::shoot to client::sendMsg
-        //connect client::coordinatesReceived to fieldview::onShoot
-        eSide = ClientSide;
+        QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootClientSend);
+        QObject::connect(mClient, &Client::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
     }
 }
 
-void MainWindow::onCoordinatesReceived(const QPoint &coordinates)
+void MainWindow::onShootServerSend(const QPoint &coordinates)
 {
-    qDebug() << "HERE: x=" << coordinates.x() << ", y=" << coordinates.y();
+    std::string sBuffer = std::to_string(coordinates.x()) + ";" + std::to_string(coordinates.y());
+    mServer->sendMsg(sBuffer.c_str());
+}
+
+void MainWindow::onShootClientSend(const QPoint &coordinates)
+{
+    std::string sBuffer = std::to_string(coordinates.x()) + ";" + std::to_string(coordinates.y());
+    mClient->sendMsg(sBuffer.c_str());
 }
 
 const char* MainWindow::mButtonTitles[] = {"New game", "Settings", "About", "Exit", "Create game", "Connect to game", "Back"};
