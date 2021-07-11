@@ -1,5 +1,25 @@
 #include "fieldwidget.h"
 
+void FieldWidget::setEnabledCreateServerButton(bool enabled)
+{
+    mButtonCreateServer->setVisible(enabled);
+}
+
+bool FieldWidget::enabledCreateServerButton()
+{
+    return mButtonCreateServer->isVisible();
+}
+
+void FieldWidget::setEnabledConnectToServerButton(bool enabled)
+{
+    mButtonConnectToServer->setVisible(enabled);
+}
+
+bool FieldWidget::enabledConnectToServerButton()
+{
+    return mButtonConnectToServer->isVisible();
+}
+
 FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
 {
     mMainLayout = new QVBoxLayout;
@@ -9,7 +29,7 @@ FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
 
     initFieldView();
     initRotateButton();
-    initFinishButton();
+    initServerButtons();
     mFieldLayout->addLayout(mNavigationLayout);
     mMainLayout->addLayout(mFieldLayout);
     initBackButton();
@@ -33,13 +53,17 @@ void FieldWidget::initRotateButton()
     mNavigationLayout->addWidget(mButtonRotate);
 }
 
-void FieldWidget::initFinishButton()
+void FieldWidget::initServerButtons()
 {
-    mButtonFinish = new QPushButton("Finish");
-    mButtonFinish->setFixedSize(50,50);
-    QObject::connect(mButtonFinish, &QPushButton::clicked, this, &FieldWidget::onButtonFinishClicked);
+    mButtonCreateServer = new QPushButton("Create");
+    mButtonCreateServer->setFixedSize(50,50);
+    QObject::connect(mButtonCreateServer, &QPushButton::clicked, this, &FieldWidget::onButtonCreateServerClicked);
+    mNavigationLayout->addWidget(mButtonCreateServer);
 
-    mNavigationLayout->addWidget(mButtonFinish);
+    mButtonConnectToServer = new QPushButton("Connect");
+    mButtonConnectToServer->setFixedSize(50,50);
+    QObject::connect(mButtonConnectToServer, &QPushButton::clicked, this, &FieldWidget::onButtonConnectToServerClicked);
+    mNavigationLayout->addWidget(mButtonConnectToServer);
 }
 
 void FieldWidget::initBackButton()
@@ -63,8 +87,14 @@ void FieldWidget::onBackButtonClicked()
     mView->resetShips();
 }
 
-void FieldWidget::onButtonFinishClicked()
+void FieldWidget::onButtonCreateServerClicked()
 {
     //if (mView->isFieldReady())
-        emit buttonFinishClicked();
+        emit buttonCreateServerClicked();
+}
+
+void FieldWidget::onButtonConnectToServerClicked()
+{
+    //if (mView->isFieldReady())
+        emit buttonConnectToServerClicked();
 }

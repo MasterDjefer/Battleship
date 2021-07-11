@@ -18,13 +18,22 @@
 class FieldWidget : public QWidget
 {
     Q_OBJECT
+
+public:
+    Q_PROPERTY(bool enabledCreateServerButton READ enabledCreateServerButton WRITE setEnabledCreateServerButton);
+    void setEnabledCreateServerButton(bool enabled);
+    bool enabledCreateServerButton();
+    Q_PROPERTY(bool enabledConnectToServerButton READ enabledConnectToServerButton WRITE setEnabledConnectToServerButton);
+    void setEnabledConnectToServerButton(bool enabled);
+    bool enabledConnectToServerButton();
+
 public:
     explicit FieldWidget(QWidget *parent = nullptr);
 
 private:
     void initFieldView();
     void initRotateButton();
-    void initFinishButton();
+    void initServerButtons();
     void initBackButton();
 
 private:
@@ -33,18 +42,21 @@ private:
     QHBoxLayout* mFieldLayout;
 
     QPushButton* mButtonRotate;
-    QPushButton* mButtonFinish;
+    QPushButton* mButtonCreateServer;
+    QPushButton* mButtonConnectToServer;
     QPushButton* mButtonBack;
 
     FieldView* mView;
 
 private slots:
     void onBackButtonClicked();
-    void onButtonFinishClicked();
+    void onButtonCreateServerClicked();
+    void onButtonConnectToServerClicked();
 
 signals:
     void buttonBackClicked();
-    void buttonFinishClicked();
+    void buttonCreateServerClicked();
+    void buttonConnectToServerClicked();
 };
 
 #endif // FIELDWIDGET_H

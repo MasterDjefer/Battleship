@@ -55,6 +55,10 @@ private:
 
 public slots:
     void onButtonRotateClicked();
+    void onShoot(const QPoint& coordinate);
+
+signals:
+    void shoot(const QPoint& coordinated);
 };
 
 #endif // FIELDVIEW_H

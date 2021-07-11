@@ -17,6 +17,7 @@
 #include "waitwidget.h"
 
 #include "server.h"
+#include "client.h"
 
 class MainWindow : public QWidget
 {
@@ -33,6 +34,13 @@ class MainWindow : public QWidget
         Back
     };
 
+    enum ESide
+    {
+        NoSide = 0,
+        ServerSide,
+        ClientSide
+    };
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -43,6 +51,7 @@ private:
     void initFieldWidget();
     void initWaitWidget();
     void initStates();
+    void showConnectErrorMsg();
 
 private:
     QStackedLayout *mStackedLayout;
@@ -53,6 +62,7 @@ private:
 
     QVBoxLayout* mGameModeMenu;
     MenuButton* mButtonCreateGame;
+    MenuButton* mButtonConnectToGame;
     MenuButton* mButtonBack1;
 
     FieldWidget* mFieldWidget;
@@ -61,11 +71,16 @@ private:
     QStateMachine* mStateMachine;
 
     Server* mServer;
+    Client* mClient;
 
     static const char* mButtonTitles[];
 
+    ESide eSide;
+
 private slots:
-    void onFinishButtonClicked();
+    void onCreateServerButtonClicked();
     void onBackToMapButtonClicked();
+    void onConnectToServerButtonClicked();
+    void onCoordinatesReceived(const QPoint& coordinates);
 };
 #endif // WIDGET_H

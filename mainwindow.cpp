@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent), mServer(nullptr), mClient(nullptr)
 {
     mStackedLayout = new QStackedLayout;
     this->setLayout(mStackedLayout);
@@ -15,9 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     initFieldWidget();
     initWaitWidget();
     initStates();
-
-    QObject::connect(mFieldWidget, &FieldWidget::buttonFinishClicked, this, &MainWindow::onFinishButtonClicked);
-    QObject::connect(mWaitWidget, &WaitWidget::buttonBackClicked, this, &MainWindow::onBackToMapButtonClicked);
 }
 
 MainWindow::~MainWindow()
@@ -56,7 +52,7 @@ void MainWindow::initGameModeMenu()
 
     mButtonCreateGame = new MenuButton;
     mButtonCreateGame->setText(mButtonTitles[CreateGame]);
-    MenuButton* mButtonConnectToGame = new MenuButton;
+    mButtonConnectToGame = new MenuButton;
     mButtonConnectToGame->setText(mButtonTitles[ConnectToGame]);
     mButtonBack1 = new MenuButton;
     mButtonBack1->setText(mButtonTitles[Back]);
@@ -94,38 +90,92 @@ void MainWindow::initStates()
 {
     mStateMachine = new QStateMachine(this);
 
-    QState *state1 = new QState(mStateMachine);
-    QState *state2 = new QState(mStateMachine);
-    QState *state3 = new QState(mStateMachine);
-    QState *state4 = new QState(mStateMachine);
+    QState *stateInit = new QState(mStateMachine);
+    QState *stateGameMenu = new QState(mStateMachine);
+    QState *stateFieldServer = new QState(mStateMachine);
+    QState *stateFieldClient = new QState(mStateMachine);
+    QState *stateWaitForClient = new QState(mStateMachine);
+    QState *stateConnectToServer = new QState(mStateMachine);
 
-    state1->assignProperty(mStackedLayout, "currentIndex", 0);
-    state1->addTransition(mButtonNewGame, &MenuButton::clicked, state2);
+    stateInit->assignProperty(mStackedLayout, "currentIndex", 0);
+    stateInit->addTransition(mButtonNewGame, &MenuButton::clicked, stateGameMenu);
 
-    state2->assignProperty(mStackedLayout, "currentIndex", 1);
-    state2->addTransition(mButtonBack1, &MenuButton::clicked, state1);
-    state2->addTransition(mButtonCreateGame, &MenuButton::clicked, state3);
+    stateGameMenu->assignProperty(mStackedLayout, "currentIndex", 1);
+    stateGameMenu->addTransition(mButtonBack1, &MenuButton::clicked, stateInit);
+    stateGameMenu->addTransition(mButtonCreateGame, &MenuButton::clicked, stateFieldServer);
+    stateGameMenu->addTransition(mButtonConnectToGame, &MenuButton::clicked, stateFieldClient);
 
-    state3->assignProperty(mStackedLayout, "currentIndex", 2);
-    state3->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, state2);
-    state3->addTransition(mFieldWidget, &FieldWidget::buttonFinishClicked, state4);
+    stateFieldServer->assignProperty(mStackedLayout, "currentIndex", 2);
+    stateFieldServer->assignProperty(mFieldWidget, "enabledCreateServerButton", true);
+    stateFieldServer->assignProperty(mFieldWidget, "enabledConnectToServerButton", false);
+    stateFieldServer->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, stateGameMenu);
+    stateFieldServer->addTransition(mFieldWidget, &FieldWidget::buttonCreateServerClicked, stateWaitForClient);
 
-    state4->assignProperty(mStackedLayout, "currentIndex", 3);
-    state4->addTransition(mWaitWidget, &WaitWidget::buttonBackClicked, state3);
+    stateWaitForClient->assignProperty(mStackedLayout, "currentIndex", 3);
+    stateWaitForClient->addTransition(mWaitWidget, &WaitWidget::buttonBackClicked, stateFieldServer);
+    QObject::connect(stateWaitForClient, &QState::entered, this, &MainWindow::onCreateServerButtonClicked);
+    QObject::connect(stateFieldServer, &QState::entered, this, &MainWindow::onBackToMapButtonClicked);
 
-    mStateMachine->setInitialState(state1);
+    stateFieldClient->assignProperty(mStackedLayout, "currentIndex", 2);
+    stateFieldClient->assignProperty(mFieldWidget, "enabledConnectToServerButton", true);
+    stateFieldClient->assignProperty(mFieldWidget, "enabledCreateServerButton", false);
+    stateFieldClient->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, stateGameMenu);
+//    stateFieldClient->addTransition(mFieldWidget, &FieldWidget::buttonConnectToServerClicked, stateConnectToServer);
+//    QObject::connect(stateConnectToServer, &QState::entered, this, &MainWindow::onConnectToServerButtonClicked);
+    QObject::connect(mFieldWidget, &FieldWidget::buttonConnectToServerClicked, this, &MainWindow::onConnectToServerButtonClicked);
+
+    mStateMachine->setInitialState(stateInit);
     mStateMachine->start();
 }
 
-void MainWindow::onFinishButtonClicked()
+void MainWindow::showConnectErrorMsg()
+{
+    QMessageBox msgBox;
+    msgBox.setText("Connect error");
+    msgBox.exec();
+}
+
+void MainWindow::onCreateServerButtonClicked()
 {
     mServer = new Server;
+    QObject::connect(mServer, &Server::coordinatesReceived, this, &MainWindow::onCoordinatesReceived);
     mServer->startServer();
+
+    eSide = ServerSide;
+
+    //connect fieldview::shoot to server::sendMsg
+    //connect server::coordinatesReceived to fieldview::onShoot
 }
 
 void MainWindow::onBackToMapButtonClicked()
 {
-    delete mServer;
+    if (mServer)
+    {
+        delete mServer;
+        mServer = nullptr;
+
+        eSide = NoSide;
+    }
+}
+
+void MainWindow::onConnectToServerButtonClicked()
+{
+    mClient = new Client;
+    if (!mClient->connectToServer())
+    {
+        showConnectErrorMsg();
+        delete mClient;
+    }else
+    {
+        //connect fieldview::shoot to client::sendMsg
+        //connect client::coordinatesReceived to fieldview::onShoot
+        eSide = ClientSide;
+    }
+}
+
+void MainWindow::onCoordinatesReceived(const QPoint &coordinates)
+{
+    qDebug() << "HERE: x=" << coordinates.x() << ", y=" << coordinates.y();
 }
 
 const char* MainWindow::mButtonTitles[] = {"New game", "Settings", "About", "Exit", "Create game", "Connect to game", "Back"};

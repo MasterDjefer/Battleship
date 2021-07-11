@@ -116,6 +116,8 @@ void FieldView::mousePressEvent(QMouseEvent *event)
 
         pixmap = pixmap.scaled(CELL_SIZE,CELL_SIZE);
         mCells[i][j]->setPixmap(pixmap);
+
+        emit shoot(QPoint(i, j));
     }
 }
 
@@ -425,4 +427,25 @@ void FieldView::onButtonRotateClicked()
             }
         }
     }
+}
+
+void FieldView::onShoot(const QPoint &coordinate)
+{
+    QPixmap pixmap;
+
+    switch (mFieldModel->getCellValue(coordinate.x(), coordinate.y()))
+    {
+    case FieldModel::Empty:
+        pixmap = QPixmap(":/images/empty.png");
+        break;
+    case FieldModel::Ship:
+        pixmap = QPixmap(":/images/hurted.png");
+        break;
+    default:
+        break;
+    }
+
+    pixmap = pixmap.scaled(CELL_SIZE,CELL_SIZE);
+    mCells[coordinate.x()][coordinate.y()]->setPixmap(pixmap);
+
 }
