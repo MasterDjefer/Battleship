@@ -35,6 +35,7 @@ public:
     void sendMsg(const char* buffer);
 
 protected:
+    static bool getCoordinates(char* buffer, QPoint& coordinates);
     static void assertError(int value, const char* msg);
 
 signals:

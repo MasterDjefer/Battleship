@@ -14,7 +14,6 @@ public:
 
 private:
     static void* start(void* args);
-    static bool getCoordinates(char* buffer, QPoint& coordinates);
 
 signals:
     void connectionAccepted();

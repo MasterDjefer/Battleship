@@ -53,7 +53,14 @@ void* Client::receiveMsg(void* args)
         memset(buffer, 0, BUFFER_SIZE);
         assertError(recv(self->mClientSocket, buffer, BUFFER_SIZE, 0), "recv");
 
-        //signal emit
+        QPoint coordinates;
+        if (self->getCoordinates(buffer, coordinates))
+        {
+            //emit signal with coordanites
+            emit self->coordinatesReceived(coordinates);
+        }
+
+        cout << buffer << endl;
     }
 
     return nullptr;

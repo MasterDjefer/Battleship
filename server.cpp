@@ -76,17 +76,3 @@ void* Server::start(void* args)
 
     return nullptr;
 }
-
-bool Server::getCoordinates(char *buffer, QPoint &coordinates)
-{
-    std::string sBuffer = buffer;
-    size_t separatorPos = sBuffer.find(';');
-    if (separatorPos != std::string::npos)
-    {
-        coordinates.setX(std::stoi(sBuffer.substr(0, separatorPos)));
-        coordinates.setY(std::stoi(sBuffer.substr(separatorPos + 1)));
-        return true;
-    }
-
-    return false;
-}
