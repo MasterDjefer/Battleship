@@ -1,34 +1,29 @@
 #include "server.h"
 
-Server::Server() : mClientSocket(-1)
+Server::Server() : NetworkBase()
 {
     mServerSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    (mServerSock);
+    assertError(mServerSock, "socket create");
 
     struct sockaddr_in sockAddr;
     sockAddr.sin_family = AF_INET;
     sockAddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     sockAddr.sin_port = htons(PORT);
 
-    (bind(mServerSock, (sockaddr*)&sockAddr, sizeof(sockAddr)));
-    (listen(mServerSock, 10));
+    assertError(bind(mServerSock, (sockaddr*)&sockAddr, sizeof(sockAddr)), "bind");
+    assertError(listen(mServerSock, 10), "listen");
 }
 
 Server::~Server()
 {
-    close(mServerSock);
-    pthread_kill(mThread, 0);
-}
-
-void Server::sendMsg(char* buffer)
-{
-    if (mClientSocket == -1)
+    int res = pthread_cancel(mThread);
+    if (res != 0)
     {
-        cout << "error send msg" << endl;
+        cout << "error: thread" << endl;
         exit(EXIT_FAILURE);
     }
 
-    assertError(send(mClientSocket, buffer, strlen(buffer), 0));
+    assertError(close(mServerSock), "close");
 }
 
 void Server::startServer()
@@ -39,33 +34,41 @@ void Server::startServer()
 
 void* Server::start(void* args)
 {
-    (void)args;
+    Server* self = (Server*)args;
 
     struct sockaddr_in clientSockAddr;
     socklen_t clientSockAddrLen = sizeof(clientSockAddr);
 
     cout << "waiting..." << endl;
-    mClientSocket = accept(mServerSock, (sockaddr*)&clientSockAddr, &clientSockAddrLen);
+    self->mClientSocket = accept(self->mServerSock, (sockaddr*)&clientSockAddr, &clientSockAddrLen);
+    emit self->connectionAccepted();
     cout << "got connection" << endl;
-    assertError(mClientSocket);
+    assertError(self->mClientSocket, "client socket");
 
     char buffer[BUFFER_SIZE];
     while (true)
     {
         memset(buffer, 0, BUFFER_SIZE);
 
-        int resRecv = recv(mClientSocket, buffer, BUFFER_SIZE, 0);
+        int resRecv = recv(self->mClientSocket, buffer, BUFFER_SIZE, 0);
 
         if (resRecv == ERROR)
         {
             cout << "error recv" << endl;
-            close(mClientSocket);
+            close(self->mClientSocket);
         }
         if (resRecv == 0)
         {
-            cout << "client socket closed" << endl;
-            close(mClientSocket);
+            cout << "client socket closed: resRecv = 0" << endl;
+            close(self->mClientSocket);
             return nullptr;
+        }
+
+        QPoint coordinates;
+        if (getCoordinates(buffer, coordinates))
+        {
+            //emit signal with coordanites
+            emit self->coordinatesReceived(coordinates);
         }
 
         cout << buffer << endl;
@@ -74,11 +77,16 @@ void* Server::start(void* args)
     return nullptr;
 }
 
-void Server::assertError(int value)
+bool Server::getCoordinates(char *buffer, QPoint &coordinates)
 {
-    if (value == ERROR)
+    std::string sBuffer = buffer;
+    size_t separatorPos = sBuffer.find(';');
+    if (separatorPos != std::string::npos)
     {
-        cout << "error" << endl;
-        exit(EXIT_FAILURE);
+        coordinates.setX(std::stoi(sBuffer.substr(0, separatorPos)));
+        coordinates.setY(std::stoi(sBuffer.substr(separatorPos + 1)));
+        return true;
     }
+
+    return false;
 }
