@@ -1,6 +1,15 @@
 #include "server.h"
 
-Server::Server() : NetworkBase()
+Server::Server() : NetworkBase(), mServerSock(-1)
+{
+}
+
+Server::~Server()
+{
+    stopServer();
+}
+
+void Server::startServer()
 {
     mServerSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     assertError(mServerSock, "socket create");
@@ -12,24 +21,30 @@ Server::Server() : NetworkBase()
 
     assertError(bind(mServerSock, (sockaddr*)&sockAddr, sizeof(sockAddr)), "bind");
     assertError(listen(mServerSock, 10), "listen");
+
+    pthread_create(&mThread, NULL, (ThreadFunc)&Server::start, (void*)this);
+    pthread_detach(mThread);
 }
 
-Server::~Server()
+void Server::stopServer()
 {
+    if (mClientSocket != -1)
+    {
+        assertError(close(mClientSocket), "close");
+        mClientSocket = -1;
+    }
+    if (mServerSock != -1)
+    {
+        assertError(close(mServerSock), "close");
+        mServerSock = -1;
+    }
+
     int res = pthread_cancel(mThread);
     if (res != 0)
     {
         cout << "error: thread" << endl;
         exit(EXIT_FAILURE);
     }
-
-    assertError(close(mServerSock), "close");
-}
-
-void Server::startServer()
-{
-    pthread_create(&mThread, NULL, (ThreadFunc)&Server::start, (void*)this);
-    pthread_detach(mThread);
 }
 
 void* Server::start(void* args)
@@ -42,8 +57,14 @@ void* Server::start(void* args)
     cout << "waiting..." << endl;
     self->mClientSocket = accept(self->mServerSock, (sockaddr*)&clientSockAddr, &clientSockAddrLen);
     emit self->connectionAccepted();
-    cout << "got connection" << endl;
-    assertError(self->mClientSocket, "client socket");
+    cout << "connection accepted" << endl;
+
+    //assertError(self->mClientSocket, "client socket");
+    if (self->mClientSocket == -1)
+    {
+        cout << "socket was closed" << endl;
+        return NULL;
+    }
 
     char buffer[BUFFER_SIZE];
     while (true)

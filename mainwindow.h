@@ -44,6 +44,7 @@ private:
     void initFieldWidget();
     void initWaitWidget();
     void initStates();
+    void initServer();
     void showConnectErrorMsg();
 
 private:

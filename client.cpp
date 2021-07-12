@@ -2,12 +2,16 @@
 
 Client::Client() : NetworkBase()
 {
-    mClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    assertError(mClientSocket, "socket create");
 }
 
 Client::~Client()
 {
+    if (mClientSocket != -1)
+    {
+        assertError(close(mClientSocket), "close");
+        mClientSocket = -1;
+    }
+
     int res = pthread_cancel(mThread);
     if (res != 0)
     {
@@ -15,11 +19,13 @@ Client::~Client()
         exit(EXIT_FAILURE);
     }
 
-    assertError(close(mClientSocket), "close");
 }
 
 bool Client::connectToServer()
 {
+    mClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    assertError(mClientSocket, "socket create");
+
     struct sockaddr_in sockAddr;
     sockAddr.sin_family = AF_INET;
     sockAddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -52,6 +58,7 @@ void* Client::receiveMsg(void* args)
     {
         memset(buffer, 0, BUFFER_SIZE);
         assertError(recv(self->mClientSocket, buffer, BUFFER_SIZE, 0), "recv");
+        cout << "ERROR MAJOR!!!" << endl;
 
         QPoint coordinates;
         if (self->getCoordinates(buffer, coordinates))

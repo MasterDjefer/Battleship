@@ -29,7 +29,6 @@ public:
 
 public:
     explicit FieldWidget(QWidget *parent = nullptr);
-    void changePlayModeView();
 
 private:
     void initFieldView();
@@ -58,6 +57,7 @@ private slots:
 
 public slots:
     void onShoot(const QPoint& coordinates);
+    void changePlayModeView();
 
 signals:
     void buttonBackClicked();

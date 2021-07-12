@@ -11,6 +11,7 @@ public:
     Server();
     ~Server();
     void startServer();
+    void stopServer();
 
 private:
     static void* start(void* args);

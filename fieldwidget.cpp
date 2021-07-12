@@ -42,6 +42,7 @@ FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
 
 void FieldWidget::changePlayModeView()
 {
+    qDebug() << "catch";
     mView->changeMode(FieldView::SelfMode);
 
     mEnemyView->changeMode(FieldView::EnemyMode);
