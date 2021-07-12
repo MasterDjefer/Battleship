@@ -22,10 +22,19 @@ class FieldView : public QGraphicsView
 {
     Q_OBJECT
 
-typedef std::map<int, int> ShipsInfo;
+    typedef std::map<int, int> ShipsInfo;
+
+public:
+    enum EFieldMode
+    {
+        EditMode = 0,
+        SelfMode,
+        EnemyMode
+    };
 
 public:
     FieldView();
+    void changeMode(EFieldMode fieldMode);
     void resetShips();
     bool isFieldReady();
 
@@ -35,6 +44,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
+    void createScene();
     void initField();
     void initShips();
     void setShipDefaultPos(int index);
@@ -43,6 +53,7 @@ private:
     bool isShipPrimaryPos(QGraphicsRectItem* ship);
     void rotateShip(QGraphicsRectItem* ship);
     bool isShipOut(QGraphicsRectItem* ship);
+    void setBattleState();
 
 private:
     QGraphicsScene* mScene;
@@ -52,6 +63,8 @@ private:
     QVector<QGraphicsRectItem*> mShips;
     QVector<QGraphicsRectItem*> mShipsPosition;
     QGraphicsRectItem* mCurrentItem;
+
+    EFieldMode mFieldMode;
 
 public slots:
     void onButtonRotateClicked();

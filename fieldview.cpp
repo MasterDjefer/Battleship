@@ -1,20 +1,57 @@
 #include "fieldview.h"
 
-FieldView::FieldView() : mCurrentItem(nullptr)
+FieldView::FieldView() : mCurrentItem(nullptr), mFieldMode(EditMode)
 {
     mFieldModel = new FieldModel;
 
-    mScene = new QGraphicsScene;
-    mScene->setSceneRect(0, 0, (FIELD_SIZE + 6 )* CELL_SIZE, FIELD_SIZE * CELL_SIZE);
+    createScene();
 
-    this->setScene(mScene);
-    this->setFixedSize(mScene->width(), mScene->height());
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-
     initField();
-    initShips();}
+    initShips();
+}
+
+void FieldView::changeMode(EFieldMode fieldMode)
+{
+    mFieldMode = fieldMode;
+
+    QVector<QGraphicsRectItem*> cShips;
+    std::for_each(mShips.begin(), mShips.end(), [&cShips](QGraphicsRectItem* item)
+    {
+        cShips.push_back(new QGraphicsRectItem(item->rect()));
+    });
+
+    switch (mFieldMode)
+    {
+    case SelfMode:
+        delete mScene;
+        createScene();
+        mShips.clear();
+        std::for_each(cShips.begin(), cShips.end(), [this](QGraphicsRectItem* item)
+        {
+            mShips.push_back(item);
+        });
+
+        for (int i = mShips.size() - 1; i >= 0; --i)
+        {
+            //cant add it because 'delete mScene delete also child component'
+            mScene->addItem(mShips.at(i));
+        }
+
+        break;
+
+    case EnemyMode:
+        delete mScene;
+        createScene();
+
+        break;
+
+    default:
+        break;
+    }
+}
 
 void FieldView::resetShips()
 {
@@ -219,6 +256,15 @@ void FieldView::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+void FieldView::createScene()
+{
+    mScene = new QGraphicsScene;
+    mScene->setSceneRect(0, 0, (FIELD_SIZE + ((mFieldMode == EditMode) ? 6 : 0))* CELL_SIZE, FIELD_SIZE * CELL_SIZE);
+
+    this->setScene(mScene);
+    this->setFixedSize(mScene->width(), mScene->height());
+}
+
 void FieldView::initField()
 {
     for (int i = 0; i < FIELD_SIZE; ++i)
@@ -397,6 +443,20 @@ bool FieldView::isShipOut(QGraphicsRectItem *ship)
     }
 
     return false;
+}
+
+void FieldView::setBattleState()
+{
+    mScene = new QGraphicsScene;
+    mScene->setSceneRect(0, 0, (FIELD_SIZE + 0)* CELL_SIZE, FIELD_SIZE * CELL_SIZE);
+
+    this->setScene(mScene);
+    this->setFixedSize(mScene->width(), mScene->height());
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    initField();
+    initShips();
 }
 
 void FieldView::onButtonRotateClicked()

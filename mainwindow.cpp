@@ -140,6 +140,9 @@ void MainWindow::onCreateServerButtonClicked()
     mServer = new Server;
     mServer->startServer();
 
+    mFieldWidget->changePlayModeView();
+
+    //QObject::connect(mServer, &Server::connectionAccepted, mFieldWidget, &FieldWidget::onShoot);
     QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootServerSend);
     QObject::connect(mServer, &Server::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
 }

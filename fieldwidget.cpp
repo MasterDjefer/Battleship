@@ -40,10 +40,23 @@ FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
     QObject::connect(mView, &FieldView::shoot, this, &FieldWidget::onShootFromSignal);
 }
 
+void FieldWidget::changePlayModeView()
+{
+    mView->changeMode(FieldView::SelfMode);
+
+    mEnemyView->changeMode(FieldView::EnemyMode);
+    mEnemyView->setVisible(true);
+}
+
 void FieldWidget::initFieldView()
 {
     mView = new FieldView;
     mFieldLayout->addWidget(mView);
+
+    //added enemy view
+    mEnemyView = new FieldView;
+    mEnemyView->setVisible(false);
+    mFieldLayout->addWidget(mEnemyView);
 }
 
 void FieldWidget::initRotateButton()

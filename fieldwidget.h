@@ -29,6 +29,7 @@ public:
 
 public:
     explicit FieldWidget(QWidget *parent = nullptr);
+    void changePlayModeView();
 
 private:
     void initFieldView();
@@ -47,6 +48,7 @@ private:
     QPushButton* mButtonBack;
 
     FieldView* mView;
+    FieldView* mEnemyView;
 
 private slots:
     void onBackButtonClicked();
