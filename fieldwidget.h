@@ -29,6 +29,7 @@ public:
 
 public:
     explicit FieldWidget(QWidget *parent = nullptr);
+    void copyState(const FieldWidget* const fieldWidget);
 
 private:
     void initFieldView();

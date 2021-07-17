@@ -40,9 +40,13 @@ FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
     QObject::connect(mView, &FieldView::shoot, this, &FieldWidget::onShootFromSignal);
 }
 
+void FieldWidget::copyState(const FieldWidget * const fieldWidget)
+{
+    mView->copyState(fieldWidget->mView);
+}
+
 void FieldWidget::changePlayModeView()
 {
-    qDebug() << "catch";
     mView->changeMode(FieldView::SelfMode);
 
     mEnemyView->changeMode(FieldView::EnemyMode);

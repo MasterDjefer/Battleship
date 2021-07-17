@@ -462,6 +462,17 @@ void FieldView::setBattleState()
     initShips();
 }
 
+void FieldView::copyState(const FieldView * const fieldView)
+{
+    std::for_each(fieldView->mShips.begin(), fieldView->mShips.end(), [this](QGraphicsRectItem* item)
+    {
+        QGraphicsRectItem* nItem = new QGraphicsRectItem(item->rect());
+        nItem->setBrush(Qt::red);
+        this->mShips.push_back(nItem);
+        this->mScene->addItem(nItem);
+    });
+}
+
 void FieldView::onButtonRotateClicked()
 {
     if (mCurrentItem)

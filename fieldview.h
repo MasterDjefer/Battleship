@@ -37,6 +37,7 @@ public:
     void changeMode(EFieldMode fieldMode);
     void resetShips();
     bool isFieldReady();
+    void copyState(const FieldView* const fieldView);
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;

@@ -43,6 +43,7 @@ private:
     void initGameModeMenu();
     void initFieldWidget();
     void initWaitWidget();
+    void initPlayModeWidget();
     void initStates();
     void initServer();
     void showConnectErrorMsg();
@@ -60,6 +61,7 @@ private:
     MenuButton* mButtonBack1;
 
     FieldWidget* mFieldWidget;
+    FieldWidget* mPlayModeWidget;
     WaitWidget* mWaitWidget;
 
     QStateMachine* mStateMachine;
