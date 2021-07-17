@@ -6,6 +6,7 @@
 class Server : public NetworkBase
 {
     Q_OBJECT
+
     int mServerSock;
 public:
     Server();

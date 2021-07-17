@@ -129,6 +129,7 @@ void MainWindow::initStates()
     stateFieldClient->assignProperty(mFieldWidget, "enabledConnectToServerButton", true);
     stateFieldClient->assignProperty(mFieldWidget, "enabledCreateServerButton", false);
     stateFieldClient->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, stateGameMenu);
+    stateFieldClient->addTransition(mClient, &Client::connectedToServer, stateFieldPlayMode);
     QObject::connect(mFieldWidget, &FieldWidget::buttonConnectToServerClicked, this, &MainWindow::onConnectToServerButtonClicked);
 
     stateFieldPlayMode->assignProperty(mStackedLayout, "currentIndex", 4);
@@ -140,7 +141,6 @@ void MainWindow::initStates()
 void MainWindow::initServer()
 {
     mServer = new Server;
-    //QObject::connect(mServer, &Server::connectionAccepted, mFieldWidget, &FieldWidget::changePlayModeView);
 }
 
 void MainWindow::showConnectErrorMsg()
@@ -176,8 +176,11 @@ void MainWindow::onConnectToServerButtonClicked()
         delete mClient;
     }else
     {
-        QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootClientSend);
-        QObject::connect(mClient, &Client::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
+        mPlayModeWidget->copyState(mFieldWidget);
+        mPlayModeWidget->changePlayModeView();
+
+//        QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootClientSend);
+//        QObject::connect(mClient, &Client::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
     }
 }
 

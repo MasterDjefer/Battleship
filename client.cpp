@@ -34,12 +34,14 @@ bool Client::connectToServer()
     bool res = ::connect(mClientSocket, (sockaddr*)&sockAddr, sizeof(sockAddr)) == 0;
     if (res)
     {
+        emit connectedToServer();
+        std::cout << "it\'s client!"<< std::endl;
+
         char buffer[BUFFER_SIZE];
         memset(buffer, 0, BUFFER_SIZE);
         strcpy(buffer, "hello from the client");
 
         assertError(send(mClientSocket, buffer, strlen(buffer), 0), "send");
-    //    close(mClientSocket);
 
         pthread_create(&mThread, NULL, (ThreadFunc)&Client::receiveMsg, (void*)this);
         pthread_detach(mThread);

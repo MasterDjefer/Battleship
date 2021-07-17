@@ -17,17 +17,18 @@ void FieldView::changeMode(EFieldMode fieldMode)
 {
     mFieldMode = fieldMode;
 
-    QVector<QGraphicsRectItem*> cShips;
-    std::for_each(mShips.begin(), mShips.end(), [&cShips](QGraphicsRectItem* item)
-    {
-        QGraphicsRectItem* nItem = new QGraphicsRectItem(item->rect());
-        nItem->setBrush(Qt::red);
-        cShips.push_back(nItem);
-    });
-
     switch (mFieldMode)
     {
     case SelfMode:
+    {
+        QVector<QGraphicsRectItem*> cShips;
+        std::for_each(mShips.begin(), mShips.end(), [&cShips](QGraphicsRectItem* item)
+        {
+            QGraphicsRectItem* nItem = new QGraphicsRectItem(item->rect());
+            nItem->setBrush(Qt::red);
+            cShips.push_back(nItem);
+        });
+
         delete mScene;
         createScene();
         initField();
@@ -43,6 +44,7 @@ void FieldView::changeMode(EFieldMode fieldMode)
             //cant add it because 'delete mScene delete also child component'
             mScene->addItem(mShips.at(i));
         }
+    }
         break;
 
     case EnemyMode:

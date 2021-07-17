@@ -5,6 +5,8 @@
 
 class Client : public NetworkBase
 {
+    Q_OBJECT
+
 public:
     Client();
     ~Client();
@@ -12,6 +14,9 @@ public:
 
 private:
     static void* receiveMsg(void* args);
+
+signals:
+    void connectedToServer();
 };
 
 #endif // CLIENT_H
