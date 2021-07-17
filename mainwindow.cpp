@@ -142,11 +142,13 @@ void MainWindow::initStates()
 void MainWindow::initServer()
 {
     mServer = new Server;
+    QObject::connect(mServer, &Server::coordinatesReceived, mPlayModeWidget, &FieldWidget::onShoot);
 }
 
 void MainWindow::initClient()
 {
     mClient = new Client;
+    QObject::connect(mClient, &Client::coordinatesReceived, mPlayModeWidget, &FieldWidget::onShoot);
 }
 
 void MainWindow::showConnectErrorMsg()
@@ -163,9 +165,7 @@ void MainWindow::onCreateServerButtonClicked()
     mPlayModeWidget->copyState(mFieldWidget);
     mPlayModeWidget->changePlayModeView();
 
-    //QObject::connect(mServer, &Server::connectionAccepted, mFieldWidget, &FieldWidget::onShoot);
-//    QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootServerSend);
-//    QObject::connect(mServer, &Server::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
+    QObject::connect(mPlayModeWidget, &FieldWidget::shoot, this, &MainWindow::onShootServerSend);
 }
 
 void MainWindow::onBackToMapButtonClicked()
@@ -184,8 +184,7 @@ void MainWindow::onConnectToServerButtonClicked()
         mPlayModeWidget->copyState(mFieldWidget);
         mPlayModeWidget->changePlayModeView();
 
-//        QObject::connect(mFieldWidget, &FieldWidget::shoot, this, &MainWindow::onShootClientSend);
-//        QObject::connect(mClient, &Client::coordinatesReceived, mFieldWidget, &FieldWidget::onShoot);
+        QObject::connect(mPlayModeWidget, &FieldWidget::shoot, this, &MainWindow::onShootClientSend);
     }
 }
 

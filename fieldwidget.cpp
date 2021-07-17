@@ -37,7 +37,7 @@ FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
     mMainLayout->setAlignment(Qt::AlignCenter);
     this->setLayout(mMainLayout);
 
-    QObject::connect(mView, &FieldView::shoot, this, &FieldWidget::onShootFromSignal);
+    QObject::connect(mEnemyView, &FieldView::shoot, this, &FieldWidget::onShootFromSignal);
 }
 
 void FieldWidget::copyState(const FieldWidget * const fieldWidget)

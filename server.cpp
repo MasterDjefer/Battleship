@@ -28,11 +28,11 @@ void Server::startServer()
 
 void Server::stopServer()
 {
-    if (mClientSocket != -1)
-    {
-        assertError(close(mClientSocket), "close");
-        mClientSocket = -1;
-    }
+//    if (mClientSocket != -1)
+//    {
+//        assertError(close(mClientSocket), "close");
+//        mClientSocket = -1;
+//    }
     if (mServerSock != -1)
     {
         assertError(close(mServerSock), "close");

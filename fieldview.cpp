@@ -113,59 +113,65 @@ void FieldView::mousePressEvent(QMouseEvent *event)
         int i = cellPos.x();
         int j = cellPos.y();
 
-        if (mCurrentItem)
+        if (mFieldMode == EditMode)
         {
-            QPen pen;
-            pen.setWidth(1);
-            mCurrentItem->setPen(pen);
-        }
-
-        for (int i = 0; i < mShips.size(); ++i)
-        {
-            QGraphicsRectItem* rect = mShips.at(i);
-
-            if ((event->x() >= rect->rect().x() && event->x() <= (rect->rect().x() + rect->rect().width())) &&
-                (event->y() >= rect->rect().y() && event->y() <= (rect->rect().y() + rect->rect().height())))
+            if (mCurrentItem)
             {
-                mCurrentItem = rect;
                 QPen pen;
-                pen.setWidth(3);
-                rect->setPen(pen);
-                return;
+                pen.setWidth(1);
+                mCurrentItem->setPen(pen);
             }
+
+            for (int i = 0; i < mShips.size(); ++i)
+            {
+                QGraphicsRectItem* rect = mShips.at(i);
+
+                if ((event->x() >= rect->rect().x() && event->x() <= (rect->rect().x() + rect->rect().width())) &&
+                    (event->y() >= rect->rect().y() && event->y() <= (rect->rect().y() + rect->rect().height())))
+                {
+                    mCurrentItem = rect;
+                    QPen pen;
+                    pen.setWidth(3);
+                    rect->setPen(pen);
+                    return;
+                }
+            }
+
+            mCurrentItem = nullptr;
+
+
+            /*if (i >= FIELD_SIZE || j >= FIELD_SIZE)
+                return;
+
+
+            QPixmap pixmap;
+
+            switch (mFieldModel->getCellValue(i, j))
+            {
+            case FieldModel::Empty:
+                pixmap = QPixmap(":/images/empty.png");
+                break;
+            case FieldModel::Ship:
+                pixmap = QPixmap(":/images/hurted.png");
+                break;
+            default:
+                break;
+            }
+
+            pixmap = pixmap.scaled(CELL_SIZE,CELL_SIZE);
+            mCells[i][j]->setPixmap(pixmap);*/
         }
-
-        mCurrentItem = nullptr;
-
-
-        if (i >= FIELD_SIZE || j >= FIELD_SIZE)
-            return;
-
-
-        QPixmap pixmap;
-
-        switch (mFieldModel->getCellValue(i, j))
+        else
+        if (mFieldMode == EnemyMode)
         {
-        case FieldModel::Empty:
-            pixmap = QPixmap(":/images/empty.png");
-            break;
-        case FieldModel::Ship:
-            pixmap = QPixmap(":/images/hurted.png");
-            break;
-        default:
-            break;
+            emit shoot(QPoint(i, j));
         }
-
-        pixmap = pixmap.scaled(CELL_SIZE,CELL_SIZE);
-        mCells[i][j]->setPixmap(pixmap);
-
-        emit shoot(QPoint(i, j));
     }
 }
 
 void FieldView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (mCurrentItem)
+    if (mCurrentItem && mFieldMode == EditMode)
     {
         QPoint nPos(event->pos().x() - mCurrentItem->rect().width() / 2, event->pos().y() - mCurrentItem->rect().height() / 2);
         if (nPos.x() + mCurrentItem->rect().width() > mScene->width())
@@ -193,10 +199,10 @@ void FieldView::mouseMoveEvent(QMouseEvent *event)
 
 void FieldView::mouseReleaseEvent(QMouseEvent *event)
 {
-    QPoint cellPos = cellPosition(event->pos());
-
-    if (mCurrentItem)
+    if (mCurrentItem  && mFieldMode == EditMode)
     {
+        QPoint cellPos = cellPosition(event->pos());
+
         if (cellPos.x() >= FIELD_SIZE)
         {
             int width = mCurrentItem->rect().width() > mCurrentItem->rect().height() ?
@@ -523,5 +529,4 @@ void FieldView::onShoot(const QPoint &coordinate)
 
     pixmap = pixmap.scaled(CELL_SIZE,CELL_SIZE);
     mCells[coordinate.x()][coordinate.y()]->setPixmap(pixmap);
-
 }
