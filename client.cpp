@@ -12,13 +12,16 @@ Client::~Client()
         mClientSocket = -1;
     }
 
-    int res = pthread_cancel(mThread);
-    if (res != 0)
+    if (mThread != 0)
     {
-        cout << "error: thread" << endl;
-        exit(EXIT_FAILURE);
+        int res = pthread_cancel(mThread);
+        mThread = 0;
+        if (res != 0)
+        {
+            cout << "error: thread" << endl;
+            exit(EXIT_FAILURE);
+        }
     }
-
 }
 
 bool Client::connectToServer()

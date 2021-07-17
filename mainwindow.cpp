@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), mServer(nullptr), mCl
     initWaitWidget();
     initPlayModeWidget();
     initServer();
+    initClient();
     initStates();
 }
 
@@ -143,6 +144,11 @@ void MainWindow::initServer()
     mServer = new Server;
 }
 
+void MainWindow::initClient()
+{
+    mClient = new Client;
+}
+
 void MainWindow::showConnectErrorMsg()
 {
     QMessageBox msgBox;
@@ -169,7 +175,6 @@ void MainWindow::onBackToMapButtonClicked()
 
 void MainWindow::onConnectToServerButtonClicked()
 {
-    mClient = new Client;
     if (!mClient->connectToServer())
     {
         showConnectErrorMsg();

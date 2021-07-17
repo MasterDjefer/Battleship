@@ -46,6 +46,7 @@ private:
     void initPlayModeWidget();
     void initStates();
     void initServer();
+    void initClient();
     void showConnectErrorMsg();
 
 private:

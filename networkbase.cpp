@@ -1,6 +1,6 @@
 #include "networkbase.h"
 
-NetworkBase::NetworkBase() : mClientSocket(-1)
+NetworkBase::NetworkBase() : mClientSocket(-1), mThread(0)
 {
 }
 
