@@ -1,11 +1,49 @@
 #include "client.h"
 
-Client::Client() : NetworkBase()
+Client::Client() : NetworkBase(), mClientConnected(false)
 {
 }
 
 Client::~Client()
 {
+    disconnect();
+}
+
+bool Client::connectToServer()
+{
+    mClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    assertError(mClientSocket, "socket create");
+
+    struct sockaddr_in sockAddr;
+    sockAddr.sin_family = AF_INET;
+    sockAddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    sockAddr.sin_port = htons(PORT);
+
+    bool res = ::connect(mClientSocket, (sockaddr*)&sockAddr, sizeof(sockAddr)) == 0;
+    if (res)
+    {
+        mClientConnected = true;
+
+        emit connectedToServer();
+        std::cout << "it\'s client!"<< std::endl;
+
+        char buffer[BUFFER_SIZE];
+        memset(buffer, 0, BUFFER_SIZE);
+        strcpy(buffer, "hello from the client");
+
+        assertError(send(mClientSocket, buffer, strlen(buffer), 0), "send");
+
+        pthread_create(&mThread, NULL, (ThreadFunc)&Client::receiveMsg, (void*)this);
+        pthread_detach(mThread);
+    }
+
+    return res;
+}
+
+void Client::disconnect()
+{
+    mClientConnected = false;
+
     if (mClientSocket != -1)
     {
         assertError(close(mClientSocket), "close");
@@ -24,33 +62,9 @@ Client::~Client()
     }
 }
 
-bool Client::connectToServer()
+bool Client::isClientConnected()
 {
-    mClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    assertError(mClientSocket, "socket create");
-
-    struct sockaddr_in sockAddr;
-    sockAddr.sin_family = AF_INET;
-    sockAddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    sockAddr.sin_port = htons(PORT);
-
-    bool res = ::connect(mClientSocket, (sockaddr*)&sockAddr, sizeof(sockAddr)) == 0;
-    if (res)
-    {
-        emit connectedToServer();
-        std::cout << "it\'s client!"<< std::endl;
-
-        char buffer[BUFFER_SIZE];
-        memset(buffer, 0, BUFFER_SIZE);
-        strcpy(buffer, "hello from the client");
-
-        assertError(send(mClientSocket, buffer, strlen(buffer), 0), "send");
-
-        pthread_create(&mThread, NULL, (ThreadFunc)&Client::receiveMsg, (void*)this);
-        pthread_detach(mThread);
-    }
-
-    return res;
+    return mClientConnected;
 }
 
 void* Client::receiveMsg(void* args)

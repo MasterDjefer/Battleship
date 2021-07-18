@@ -7,10 +7,13 @@ class Client : public NetworkBase
 {
     Q_OBJECT
 
+    bool mClientConnected;
 public:
     Client();
     ~Client();
     bool connectToServer();
+    void disconnect();
+    bool isClientConnected();
 
 private:
     static void* receiveMsg(void* args);

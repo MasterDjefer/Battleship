@@ -142,6 +142,7 @@ void MainWindow::initStates()
     stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledConnectToServerButton", false);
     stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledCreateServerButton", false);
     stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledDisconnectButton", true);
+    QObject::connect(mPlayModeWidget, &FieldWidget::buttonDisconnectClicked, this, &MainWindow::onDisconnectButtonClicked);
 
     mStateMachine->setInitialState(stateInit);
     mStateMachine->start();
@@ -193,6 +194,19 @@ void MainWindow::onConnectToServerButtonClicked()
         mPlayModeWidget->changePlayModeView();
 
         QObject::connect(mPlayModeWidget, &FieldWidget::shoot, this, &MainWindow::onShootClientSend);
+    }
+}
+
+void MainWindow::onDisconnectButtonClicked()
+{
+    if (mServer->isServerRunning())
+    {
+        mServer->stopServer();
+    }
+    else
+    if (mClient->isClientConnected())
+    {
+        mClient;
     }
 }
 

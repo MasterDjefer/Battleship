@@ -1,6 +1,6 @@
 #include "server.h"
 
-Server::Server() : NetworkBase(), mServerSock(-1)
+Server::Server() : NetworkBase(), mServerSock(-1), mServerRunning(false)
 {
 }
 
@@ -33,6 +33,8 @@ void Server::stopServer()
 //        assertError(close(mClientSocket), "close");
 //        mClientSocket = -1;
 //    }
+    mServerRunning = false;
+
     if (mServerSock != -1)
     {
         assertError(close(mServerSock), "close");
@@ -51,6 +53,11 @@ void Server::stopServer()
     }
 }
 
+bool Server::isServerRunning()
+{
+    return mServerRunning;
+}
+
 void* Server::start(void* args)
 {
     Server* self = (Server*)args;
@@ -59,6 +66,7 @@ void* Server::start(void* args)
     socklen_t clientSockAddrLen = sizeof(clientSockAddr);
 
     cout << "waiting..." << endl;
+    self->mServerRunning = true;
     self->mClientSocket = accept(self->mServerSock, (sockaddr*)&clientSockAddr, &clientSockAddrLen);
     emit self->connectionAccepted();
     cout << "connection accepted" << endl;

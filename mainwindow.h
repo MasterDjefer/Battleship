@@ -77,6 +77,7 @@ private slots:
     void onCreateServerButtonClicked();
     void onBackToMapButtonClicked();
     void onConnectToServerButtonClicked();
+    void onDisconnectButtonClicked();
     void onShootServerSend(const QPoint& coordinates);
     void onShootClientSend(const QPoint& coordinates);
 };
