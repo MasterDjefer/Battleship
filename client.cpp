@@ -1,12 +1,14 @@
 #include "client.h"
 
-Client::Client() : NetworkBase(), mClientConnected(false)
+Client::Client() : NetworkBase()
 {
+    mConnStatus = Disconnected;
 }
 
 Client::~Client()
 {
     disconnect();
+    stopThread();
 }
 
 bool Client::connectToServer()
@@ -22,7 +24,7 @@ bool Client::connectToServer()
     bool res = ::connect(mClientSocket, (sockaddr*)&sockAddr, sizeof(sockAddr)) == 0;
     if (res)
     {
-        mClientConnected = true;
+        mConnStatus = Connected;
 
         emit connectedToServer();
         std::cout << "it\'s client!"<< std::endl;
@@ -42,29 +44,14 @@ bool Client::connectToServer()
 
 void Client::disconnect()
 {
-    mClientConnected = false;
-
-    if (mClientSocket != -1)
-    {
-        assertError(close(mClientSocket), "close");
-        mClientSocket = -1;
-    }
-
-    if (mThread != 0)
-    {
-        int res = pthread_cancel(mThread);
-        mThread = 0;
-        if (res != 0)
-        {
-            cout << "error: thread" << endl;
-            exit(EXIT_FAILURE);
-        }
-    }
+    sendDisconnectMsg();
+    emit disconnected();
+    mConnStatus = Disconnected;
 }
 
 bool Client::isClientConnected()
 {
-    return mClientConnected;
+    return mConnStatus == Connected;
 }
 
 void* Client::receiveMsg(void* args)
@@ -76,8 +63,14 @@ void* Client::receiveMsg(void* args)
     while (true)
     {
         memset(buffer, 0, BUFFER_SIZE);
-        assertError(recv(self->mClientSocket, buffer, BUFFER_SIZE, 0), "recv");
-        cout << "ERROR MAJOR!!!" << endl;
+        int res = recv(self->mClientSocket, buffer, BUFFER_SIZE, 0);
+        if (res == -1 || res == 0)
+        {
+            cout << "error or server closed connection" << endl;
+            emit self->disconnected();
+            self->mConnStatus = Disconnected;
+            return nullptr;
+        }
 
         QPoint coordinates;
         if (self->getCoordinates(buffer, coordinates))

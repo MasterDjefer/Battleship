@@ -7,7 +7,6 @@ class Client : public NetworkBase
 {
     Q_OBJECT
 
-    bool mClientConnected;
 public:
     Client();
     ~Client();
@@ -20,6 +19,7 @@ private:
 
 signals:
     void connectedToServer();
+    void disconnected();
 };
 
 #endif // CLIENT_H

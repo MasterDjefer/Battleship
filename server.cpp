@@ -1,12 +1,14 @@
 #include "server.h"
 
-Server::Server() : NetworkBase(), mServerSock(-1), mServerRunning(false)
+Server::Server() : NetworkBase(), mServerSock(-1)
 {
+    mConnStatus = Stopped;
 }
 
 Server::~Server()
 {
     stopServer();
+    stopThread();
 }
 
 void Server::startServer()
@@ -22,40 +24,26 @@ void Server::startServer()
     assertError(bind(mServerSock, (sockaddr*)&sockAddr, sizeof(sockAddr)), "bind");
     assertError(listen(mServerSock, 10), "listen");
 
-    pthread_create(&mThread, NULL, (ThreadFunc)&Server::start, (void*)this);
+    pthread_create(&mThread, nullptr, (ThreadFunc)&Server::start, (void*)this);
     pthread_detach(mThread);
 }
 
 void Server::stopServer()
 {
-//    if (mClientSocket != -1)
-//    {
-//        assertError(close(mClientSocket), "close");
-//        mClientSocket = -1;
-//    }
-    mServerRunning = false;
-
-    if (mServerSock != -1)
+    if (mConnStatus == ConnectionAccepted)
     {
-        assertError(close(mServerSock), "close");
-        mServerSock = -1;
+        assertError(close(mClientSocket), "close");
     }
 
-    if (mThread != 0)
-    {
-        int res = pthread_cancel(mThread);
-        mThread = 0;
-        if (res != 0)
-        {
-            cout << "error: thread" << endl;
-            exit(EXIT_FAILURE);
-        }
-    }
+    emit serverStopped();
+    mConnStatus = Stopped;
+
+    assertError(close(mServerSock), "close");
 }
 
 bool Server::isServerRunning()
 {
-    return mServerRunning;
+    return mConnStatus == WaitingForClient || mConnStatus == ConnectionAccepted;
 }
 
 void* Server::start(void* args)
@@ -66,17 +54,19 @@ void* Server::start(void* args)
     socklen_t clientSockAddrLen = sizeof(clientSockAddr);
 
     cout << "waiting..." << endl;
-    self->mServerRunning = true;
+    self->mConnStatus = WaitingForClient;
     self->mClientSocket = accept(self->mServerSock, (sockaddr*)&clientSockAddr, &clientSockAddrLen);
-    emit self->connectionAccepted();
+    self->mConnStatus = ConnectionAccepted;
+
     cout << "connection accepted" << endl;
 
-    //assertError(self->mClientSocket, "client socket");
     if (self->mClientSocket == -1)
     {
         cout << "socket was closed" << endl;
-        return NULL;
+        return nullptr;
     }
+
+    emit self->connectionAccepted();
 
     char buffer[BUFFER_SIZE];
     while (true)
@@ -88,12 +78,12 @@ void* Server::start(void* args)
         if (resRecv == ERROR)
         {
             cout << "error recv" << endl;
-            close(self->mClientSocket);
+            return nullptr;
         }
         if (resRecv == 0)
         {
             cout << "client socket closed: resRecv = 0" << endl;
-            close(self->mClientSocket);
+            self->stopServer();
             return nullptr;
         }
 
@@ -102,6 +92,12 @@ void* Server::start(void* args)
         {
             //emit signal with coordanites
             emit self->coordinatesReceived(coordinates);
+        }
+        else
+        if (!strcmp(buffer, DISCONNECT_MSG))
+        {
+            self->stopServer();
+            return nullptr;
         }
 
         cout << buffer << endl;

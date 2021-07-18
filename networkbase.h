@@ -21,6 +21,8 @@ using namespace std;
 #define BUFFER_SIZE 100
 #define ERROR -1
 
+#define DISCONNECT_MSG "DCONN"
+
 class NetworkBase : public QObject
 {
     Q_OBJECT
@@ -28,11 +30,26 @@ class NetworkBase : public QObject
 protected:
     typedef void*(*ThreadFunc)(void*);
 
+    enum ConnectionStatus
+    {
+        Stopped,
+        WaitingForClient,
+        ConnectionAccepted,
+        Connected,
+        Disconnected
+    };
+
     pthread_t mThread;
     int mClientSocket;
+    ConnectionStatus mConnStatus;
 public:
     NetworkBase();
+    ~NetworkBase();
     void sendMsg(const char* buffer);
+    void sendDisconnectMsg();
+
+protected:
+    void stopThread();
 
 protected:
     static bool getCoordinates(char* buffer, QPoint& coordinates);

@@ -47,7 +47,7 @@ private:
     void initStates();
     void initServer();
     void initClient();
-    void showConnectErrorMsg();
+    void showWidgetMsg(const QString& errorMsg);
 
 private:
     QStackedLayout *mStackedLayout;

@@ -4,6 +4,11 @@ NetworkBase::NetworkBase() : mClientSocket(-1), mThread(0)
 {
 }
 
+NetworkBase::~NetworkBase()
+{
+    stopThread();
+}
+
 void NetworkBase::sendMsg(const char* buffer)
 {
     if (mClientSocket == -1)
@@ -13,6 +18,24 @@ void NetworkBase::sendMsg(const char* buffer)
     }
 
     assertError(send(mClientSocket, buffer, strlen(buffer), 0), "send");
+}
+
+void NetworkBase::sendDisconnectMsg()
+{
+    assertError(send(mClientSocket, DISCONNECT_MSG, strlen(DISCONNECT_MSG), 0), "send");
+}
+
+void NetworkBase::stopThread()
+{
+    if(pthread_kill(mThread, 0) == 0)//still running
+    {
+        int res = pthread_cancel(mThread);
+        if (res != 0)
+        {
+            cout << "error: thread" << endl;
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 bool NetworkBase::getCoordinates(char *buffer, QPoint &coordinates)

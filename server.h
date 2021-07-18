@@ -8,7 +8,6 @@ class Server : public NetworkBase
     Q_OBJECT
 
     int mServerSock;
-    bool mServerRunning;
 public:
     Server();
     ~Server();
@@ -21,6 +20,7 @@ private:
 
 signals:
     void connectionAccepted();
+    void serverStopped();
 };
 
 #endif // SERVER_H

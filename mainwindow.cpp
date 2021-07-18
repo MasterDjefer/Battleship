@@ -142,6 +142,8 @@ void MainWindow::initStates()
     stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledConnectToServerButton", false);
     stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledCreateServerButton", false);
     stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledDisconnectButton", true);
+    stateFieldPlayMode->addTransition(mServer, &Server::serverStopped, stateGameMenu);
+    stateFieldPlayMode->addTransition(mClient, &Client::disconnected, stateGameMenu);
     QObject::connect(mPlayModeWidget, &FieldWidget::buttonDisconnectClicked, this, &MainWindow::onDisconnectButtonClicked);
 
     mStateMachine->setInitialState(stateInit);
@@ -160,10 +162,10 @@ void MainWindow::initClient()
     QObject::connect(mClient, &Client::coordinatesReceived, mPlayModeWidget, &FieldWidget::onShoot);
 }
 
-void MainWindow::showConnectErrorMsg()
+void MainWindow::showWidgetMsg(const QString &errorMsg)
 {
     QMessageBox msgBox;
-    msgBox.setText("Connect error");
+    msgBox.setText(errorMsg);
     msgBox.exec();
 }
 
@@ -186,8 +188,7 @@ void MainWindow::onConnectToServerButtonClicked()
 {
     if (!mClient->connectToServer())
     {
-        showConnectErrorMsg();
-        delete mClient;
+        showWidgetMsg("Connection error");
     }else
     {
         mPlayModeWidget->copyState(mFieldWidget);
@@ -201,12 +202,14 @@ void MainWindow::onDisconnectButtonClicked()
 {
     if (mServer->isServerRunning())
     {
+        showWidgetMsg("Server will be stopped");
         mServer->stopServer();
     }
     else
     if (mClient->isClientConnected())
     {
-        mClient;
+        showWidgetMsg("You will be disconnected from server");
+        mClient->disconnect();
     }
 }
 
