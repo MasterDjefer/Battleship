@@ -10,6 +10,16 @@ bool FieldWidget::enabledCreateServerButton()
     return mButtonCreateServer->isVisible();
 }
 
+void FieldWidget::setEnabledRotateButton(bool enabled)
+{
+    mButtonRotate->setVisible(enabled);
+}
+
+bool FieldWidget::enabledRotateButton()
+{
+    return mButtonRotate->isVisible();
+}
+
 void FieldWidget::setEnabledConnectToServerButton(bool enabled)
 {
     mButtonConnectToServer->setVisible(enabled);
@@ -18,6 +28,16 @@ void FieldWidget::setEnabledConnectToServerButton(bool enabled)
 bool FieldWidget::enabledConnectToServerButton()
 {
     return mButtonConnectToServer->isVisible();
+}
+
+void FieldWidget::setEnabledDisconnectButton(bool enabled)
+{
+    mButtonDisconnect->setVisible(enabled);
+}
+
+bool FieldWidget::enabledDisconnectButton()
+{
+    return mButtonDisconnect->isVisible();
 }
 
 FieldWidget::FieldWidget(QWidget *parent) : QWidget(parent)
@@ -84,6 +104,11 @@ void FieldWidget::initServerButtons()
     mButtonConnectToServer->setFixedSize(50,50);
     QObject::connect(mButtonConnectToServer, &QPushButton::clicked, this, &FieldWidget::onButtonConnectToServerClicked);
     mNavigationLayout->addWidget(mButtonConnectToServer);
+
+    mButtonDisconnect = new QPushButton("Disconnect");
+    mButtonDisconnect->setFixedSize(50,50);
+    QObject::connect(mButtonDisconnect, &QPushButton::clicked, this, &FieldWidget::onButtonDisconnectClicked);
+    mNavigationLayout->addWidget(mButtonDisconnect);
 }
 
 void FieldWidget::initBackButton()
@@ -109,14 +134,17 @@ void FieldWidget::onBackButtonClicked()
 
 void FieldWidget::onButtonCreateServerClicked()
 {
-    //if (mView->isFieldReady())
-        emit buttonCreateServerClicked();
+    emit buttonCreateServerClicked();
 }
 
 void FieldWidget::onButtonConnectToServerClicked()
 {
-    //if (mView->isFieldReady())
     emit buttonConnectToServerClicked();
+}
+
+void FieldWidget::onButtonDisconnectClicked()
+{
+    emit buttonDisconnectClicked();
 }
 
 void FieldWidget::onShoot(const QPoint &coordinates)

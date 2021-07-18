@@ -23,9 +23,15 @@ public:
     Q_PROPERTY(bool enabledCreateServerButton READ enabledCreateServerButton WRITE setEnabledCreateServerButton);
     void setEnabledCreateServerButton(bool enabled);
     bool enabledCreateServerButton();
+    Q_PROPERTY(bool enabledRotateButton READ enabledRotateButton WRITE setEnabledRotateButton);
+    void setEnabledRotateButton(bool enabled);
+    bool enabledRotateButton();
     Q_PROPERTY(bool enabledConnectToServerButton READ enabledConnectToServerButton WRITE setEnabledConnectToServerButton);
     void setEnabledConnectToServerButton(bool enabled);
     bool enabledConnectToServerButton();
+    Q_PROPERTY(bool enabledDisconnectButton READ enabledDisconnectButton WRITE setEnabledDisconnectButton);
+    void setEnabledDisconnectButton(bool enabled);
+    bool enabledDisconnectButton();
 
 public:
     explicit FieldWidget(QWidget *parent = nullptr);
@@ -46,6 +52,7 @@ private:
     QPushButton* mButtonCreateServer;
     QPushButton* mButtonConnectToServer;
     QPushButton* mButtonBack;
+    QPushButton* mButtonDisconnect;
 
     FieldView* mView;
     FieldView* mEnemyView;
@@ -54,6 +61,7 @@ private slots:
     void onBackButtonClicked();
     void onButtonCreateServerClicked();
     void onButtonConnectToServerClicked();
+    void onButtonDisconnectClicked();
     void onShootFromSignal(const QPoint& coordinates);
 
 public slots:
@@ -64,6 +72,7 @@ signals:
     void buttonBackClicked();
     void buttonCreateServerClicked();
     void buttonConnectToServerClicked();
+    void buttonDisconnectClicked();
     void shoot(const QPoint& coordinates);
 };
 

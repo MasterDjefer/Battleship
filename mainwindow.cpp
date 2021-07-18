@@ -57,12 +57,12 @@ void MainWindow::initGameModeMenu()
     mButtonCreateGame->setText(mButtonTitles[CreateGame]);
     mButtonConnectToGame = new MenuButton;
     mButtonConnectToGame->setText(mButtonTitles[ConnectToGame]);
-    mButtonBack1 = new MenuButton;
-    mButtonBack1->setText(mButtonTitles[Back]);
+    mButtonBack = new MenuButton;
+    mButtonBack->setText(mButtonTitles[Back]);
 
     mGameModeMenu->addWidget(mButtonCreateGame);
     mGameModeMenu->addWidget(mButtonConnectToGame);
-    mGameModeMenu->addWidget(mButtonBack1);
+    mGameModeMenu->addWidget(mButtonBack);
 
     mGameModeMenu->setAlignment(Qt::AlignHCenter);
 
@@ -110,13 +110,15 @@ void MainWindow::initStates()
     stateInit->addTransition(mButtonNewGame, &MenuButton::clicked, stateGameMenu);
 
     stateGameMenu->assignProperty(mStackedLayout, "currentIndex", 1);
-    stateGameMenu->addTransition(mButtonBack1, &MenuButton::clicked, stateInit);
+    stateGameMenu->addTransition(mButtonBack, &MenuButton::clicked, stateInit);
     stateGameMenu->addTransition(mButtonCreateGame, &MenuButton::clicked, stateFieldServer);
     stateGameMenu->addTransition(mButtonConnectToGame, &MenuButton::clicked, stateFieldClient);
 
     stateFieldServer->assignProperty(mStackedLayout, "currentIndex", 2);
+    stateFieldServer->assignProperty(mFieldWidget, "enabledRotateButton", true);
     stateFieldServer->assignProperty(mFieldWidget, "enabledCreateServerButton", true);
     stateFieldServer->assignProperty(mFieldWidget, "enabledConnectToServerButton", false);
+    stateFieldServer->assignProperty(mFieldWidget, "enabledDisconnectButton", false);
     stateFieldServer->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, stateGameMenu);
     stateFieldServer->addTransition(mFieldWidget, &FieldWidget::buttonCreateServerClicked, stateWaitForClient);
 
@@ -127,13 +129,19 @@ void MainWindow::initStates()
     QObject::connect(stateWaitForClient, &QState::entered, this, &MainWindow::onCreateServerButtonClicked);
 
     stateFieldClient->assignProperty(mStackedLayout, "currentIndex", 2);
+    stateFieldClient->assignProperty(mFieldWidget, "enabledRotateButton", true);
     stateFieldClient->assignProperty(mFieldWidget, "enabledConnectToServerButton", true);
     stateFieldClient->assignProperty(mFieldWidget, "enabledCreateServerButton", false);
+    stateFieldClient->assignProperty(mFieldWidget, "enabledDisconnectButton", false);
     stateFieldClient->addTransition(mFieldWidget, &FieldWidget::buttonBackClicked, stateGameMenu);
     stateFieldClient->addTransition(mClient, &Client::connectedToServer, stateFieldPlayMode);
     QObject::connect(mFieldWidget, &FieldWidget::buttonConnectToServerClicked, this, &MainWindow::onConnectToServerButtonClicked);
 
     stateFieldPlayMode->assignProperty(mStackedLayout, "currentIndex", 4);
+    stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledRotateButton", false);
+    stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledConnectToServerButton", false);
+    stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledCreateServerButton", false);
+    stateFieldPlayMode->assignProperty(mPlayModeWidget, "enabledDisconnectButton", true);
 
     mStateMachine->setInitialState(stateInit);
     mStateMachine->start();

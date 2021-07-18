@@ -59,11 +59,12 @@ private:
     QVBoxLayout* mGameModeMenu;
     MenuButton* mButtonCreateGame;
     MenuButton* mButtonConnectToGame;
-    MenuButton* mButtonBack1;
+    MenuButton* mButtonBack;
 
     FieldWidget* mFieldWidget;
-    FieldWidget* mPlayModeWidget;
     WaitWidget* mWaitWidget;
+
+    FieldWidget* mPlayModeWidget;
 
     QStateMachine* mStateMachine;
 
